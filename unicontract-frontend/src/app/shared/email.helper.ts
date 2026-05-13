@@ -1,8 +1,8 @@
-import { environment } from 'src/environments/environment';
+import { AppConstants } from 'src/app/app-constants';
 
 export class EmailHelper {
   public static allowedDomains(): string[] {
-    return (environment.allowedEmailDomains || [])
+    return (AppConstants.allowedEmailDomains || [])
       .map((domain) => domain.toLowerCase().trim().replace(/^@/, ''))
       .filter((domain) => domain.length > 0);
   }
