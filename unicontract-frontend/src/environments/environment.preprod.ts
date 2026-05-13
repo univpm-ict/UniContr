@@ -5,4 +5,5 @@ export const environment = {
   whitelistedDomains: ['unidem-preprod.uniurb.it'],
   blacklistedRoutes: ['https://unidem-preprod.uniurb.it/unidem/unicontr/unicontr/public/auth/'],
   documentation: 'https://unidem-preprod.uniurb.it/unicontr/documentation/',
+  allowedEmailDomains: ['univpm.it'],
 };

@@ -4,5 +4,6 @@ export const environment = {
   baseHref: '/unicontr/',
   whitelistedDomains: ['unidem.uniurb.it'],
   blacklistedRoutes: ['https://unidem.uniurb.it/unidem/unicontr/unicontr/public/auth/'],
-  documentation: 'https://unidem.uniurb.it/unicontr/documentation/'
+  documentation: 'https://unidem.uniurb.it/unicontr/documentation/',
+  allowedEmailDomains: ['univpm.it']
 };
