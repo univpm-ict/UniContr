@@ -14,7 +14,7 @@ use App\Mail\FirstEmail;
 use Illuminate\Support\Facades\Mail;
 use DB;
 use App\Service\EmailService;
-use Illuminate\Support\Str;
+use App\Service\EmailHelper;
 use Illuminate\Support\Facades\Cache;
 use App\Exceptions\Handler;
 use Illuminate\Container\Container;
@@ -263,9 +263,9 @@ class InsegnamentiController extends Controller
         }
 
 
-        if ($pre && $pre->user->email && !Str::contains(strtolower($pre->user->email),'@uniurb.it')){
+        if ($pre && $pre->user->email && !EmailHelper::hasAllowedDomain($pre->user->email)){
             $email = $pre->user->anagraficaugov()->first()->e_mail;                 
-            if ($email && Str::contains(strtolower($email),'@uniurb.it')){
+            if ($email && EmailHelper::hasAllowedDomain($email)){
                 //aggiornare email utente 
                 $pre->user->email = $email;
                 $pre->user->save();                

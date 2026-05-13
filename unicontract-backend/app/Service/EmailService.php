@@ -22,7 +22,6 @@ use App\Mail\RichiestaValidazioneEmail;
 use Illuminate\Support\Facades\Mail;
 use DB;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\Service\TitulusHelper;
 
@@ -59,7 +58,7 @@ class EmailService implements ApplicationService
     public static function sendEmailContratto($insegn_id, $document, $documentName){
                 
         $pre = PrecontrattualePerGenerazione::with(['anagrafica','user','insegnamento','titulusref'])->where('insegn_id',$insegn_id)->first();         
-        if ($pre && $pre->user->email &&  Str::contains(strtolower($pre->user->email),'@uniurb.it')){         
+        if ($pre && $pre->user->email && EmailHelper::hasAllowedDomain($pre->user->email)){         
 
             $email = new ContrattoEmail($pre,$document,$documentName);        
             
@@ -112,7 +111,7 @@ class EmailService implements ApplicationService
 
     public static function sendEmailAPP_Validazione($pre){
         
-        if ($pre && $pre->user->email &&  Str::contains(strtolower($pre->user->email),'@uniurb.it')){         
+        if ($pre && $pre->user->email && EmailHelper::hasAllowedDomain($pre->user->email)){         
 
             $email = new ValidateEmail($pre);        
             
@@ -133,7 +132,7 @@ class EmailService implements ApplicationService
     }
 
     public static function sendEmailRCP($pre){
-        if ($pre && $pre->user->email &&  Str::contains(strtolower($pre->user->email),'@uniurb.it')){   
+        if ($pre && $pre->user->email && EmailHelper::hasAllowedDomain($pre->user->email)){   
 
             $email = new FirstEmail($pre);
             
@@ -179,7 +178,7 @@ class EmailService implements ApplicationService
 
     public static function sendEmailInfo($insegn_id, $entity){
         $pre = PrecontrattualePerGenerazione::with(['anagrafica','user','insegnamento'])->where('insegn_id',$insegn_id)->first();   
-        if ($pre && $pre->user->email &&  Str::contains(strtolower($pre->user->email),'@uniurb.it')){   
+        if ($pre && $pre->user->email && EmailHelper::hasAllowedDomain($pre->user->email)){   
 
             $email = new InfoEmail($pre, $entity);
             

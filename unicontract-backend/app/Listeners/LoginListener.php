@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
+use App\Service\EmailHelper;
 use App\Service\LoginService;
 use Exception;
 use App\Exceptions\Handler;
 use Illuminate\Container\Container;
-use Illuminate\Support\Str;
 
 class LoginListener
 {
@@ -108,7 +108,7 @@ class LoginListener
             $laravelUser = \App\User::where('cf', $userData['cf'])->first();
             if ($laravelUser !== null ){
                 //aggiornare email 
-                if (Str::contains(strtolower($userData['email']),'@uniurb.it')){   
+                if (EmailHelper::hasAllowedDomain($userData['email'])){   
                     $laravelUser->email = $userData['email'];
                     $laravelUser->save();  
                     Log::info('Aggiornata email laravel user [' . $laravelUser->name . ']'); 

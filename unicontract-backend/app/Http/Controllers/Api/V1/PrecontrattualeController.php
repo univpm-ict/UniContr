@@ -14,8 +14,8 @@ use App\Models\Validazioni;
 use App\Service\PrecontrattualeService;
 use App\Service\FirmaIOService;
 use Carbon\Carbon;
+use App\Service\EmailHelper;
 use App\Service\EmailService;
-use Illuminate\Support\Str;
 use App\Service\TitulusHelper;
 use App\Exports\PrecontrattualeExport;
 use Illuminate\Support\Facades\Log;
@@ -451,7 +451,7 @@ class PrecontrattualeController extends Controller
             }
 
             //verificare che al docente sia associata una email istituzionale        
-            if ($request->docente['email'] && !Str::contains(strtolower($request->docente['email']),'@uniurb.it')){
+            if ($request->docente['email'] && !EmailHelper::hasAllowedDomain($request->docente['email'])){
                 $data = null;
                 $message = 'Insegnamento non importabile: al docente '.$request->docente['name'].' non è associata una email istituzionale';
                 $success = false;            
@@ -915,7 +915,7 @@ class PrecontrattualeController extends Controller
         }
 
         $pre = Precontrattuale::with(['user'])->where('insegn_id',$request->insegn_id)->first();   
-        if ($pre && $pre->user->email && !Str::contains($pre->user->email,'@uniurb.it')){                    
+        if ($pre && $pre->user->email && !EmailHelper::hasAllowedDomain($pre->user->email)){                    
             $data = null;
             $message = 'A '.$pre->user->nameTutorString().' non è associata una email istituzionale';
             $success = false;            

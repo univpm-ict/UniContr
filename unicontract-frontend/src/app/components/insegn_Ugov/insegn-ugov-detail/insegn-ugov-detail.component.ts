@@ -25,6 +25,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MyTranslatePipe } from 'src/app/shared/pipe/custom.translatepipe';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Page } from 'src/app/shared/lookup/page';
+import { EmailHelper } from 'src/app/shared/email.helper';
 
 @Component({
     selector: 'app-insegn-ugov-detail',
@@ -316,13 +317,13 @@ export class InsegnUgovDetailComponent extends BaseComponent {
 
   email(email: string, e_mail: string, e_mail_privata: string) {
     let value = '';
-    if (email === '%@uniurb.it%') {
+    if (EmailHelper.isInstitutionalPlaceholder(email)) {
       value = email;
-    } else if (e_mail === '%@uniurb.it%') {
+    } else if (EmailHelper.isInstitutionalPlaceholder(e_mail)) {
       value = e_mail;
-    } else if (email !== '%@uniurb.it%') {
+    } else if (!EmailHelper.isInstitutionalPlaceholder(email)) {
       value = email;
-    } else if (e_mail !== '%@uniurb.it%') {
+    } else if (!EmailHelper.isInstitutionalPlaceholder(e_mail)) {
       value = e_mail;
     } else if (e_mail_privata !== '') {
       value = e_mail_privata;
@@ -333,15 +334,15 @@ export class InsegnUgovDetailComponent extends BaseComponent {
   checkEmail(email: string, e_mail: string, e_mail_privata: string) {
     let value = false;
     if (email !== null) {
-      if (email.toLowerCase().includes('@uniurb.it')) {
+      if (EmailHelper.hasAllowedDomain(email)) {
         value = true;
       }
     } else if (e_mail !== null) {
-      if (e_mail.toLowerCase().includes('@uniurb.it')) {
+      if (EmailHelper.hasAllowedDomain(e_mail)) {
         value = true;
       }
     } else if (e_mail_privata !== null) {
-      if (e_mail_privata.toLowerCase().includes('@uniurb.it')) {
+      if (EmailHelper.hasAllowedDomain(e_mail_privata)) {
         value = true;
       }
     } else {

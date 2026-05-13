@@ -16,6 +16,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { ConfirmationDialogService } from './../../../shared/confirmation-dialog/confirmation-dialog.service';
 import { TranslateService } from '@ngx-translate/core';
 import ControlUtils from 'src/app/shared/dynamic-form/control-utils';
+import { EmailHelper } from 'src/app/shared/email.helper';
 import { TranslateSelectPipe } from 'src/app/shared/pipe/translate-select.pipe';
 import { StoryProcess } from './../../../classes/storyProcess';
 import { StoryProcessService } from './../../../services/storyProcess.service';
@@ -599,7 +600,7 @@ export class AnagraficaDetailsComponent extends BaseComponent {
               },
               expressionProperties: {
                 'props.readonly': (model: any, formState: any, field: FormlyFieldConfig) => {
-                  return (model.email !== '*@uniurb.it');
+                  return !EmailHelper.isInstitutionalPlaceholder(model.email);
                 },
               }
             },

@@ -8,5 +8,6 @@ export const environment = {
   baseHref: '/',
   whitelistedDomains: ['localhost:4200','127.0.0.1:80'],
   blacklistedRoutes: ['localhost:4200/auth/'],
-  documentation: ''
+  documentation: '',
+  allowedEmailDomains: ['univpm.it']
 };

@@ -69,6 +69,14 @@ return [
      * Lista email separate da , per notifica compilazione terminata da parte del docente  
      */       
     'cmu_email' => explode(',',env('CMU_EMAIL',  'unicontract@uniurb.it,amministrazione.reclutamento.pdoc@uniurb.it')),     
+    
+    /**
+     * Lista domini email istituzionali accettati.
+     */
+    'allowed_email_domains' => array_values(array_filter(array_map(
+        static fn ($domain) => strtolower(trim(ltrim($domain, '@'))),
+        explode(',', env('ALLOWED_EMAIL_DOMAINS', 'univpm.it'))
+    ))),
         
     /**
      * Inserire nuovi IBAN in Ugov 
