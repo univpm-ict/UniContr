@@ -1,7 +1,13 @@
 import { Injectable } from "@angular/core";
+import { AppConstants } from "../app-constants";
 
 @Injectable()
 export class InsegnamTools {
+  private static readonly TIPO_CONTRATTO_ALTA_QUALIFICAZIONE = 'CONTRATTO DI ALTA QUALIFICAZIONE';
+  private static readonly TIPO_CONTRATTO_DIDATTICA_UFFICIALE = 'CONTRATTO DI DIDATTICA UFFICIALE';
+  private static readonly TIPO_CONTRATTO_DIDATTICA_INTEGRATIVA = 'CONTRATTO DI DIDATTICA INTEGRATIVA';
+  private static readonly TIPO_CONTRATTO_SUPPORTO_DIDATTICA = 'CONTRATTO DI SUPPORTO ALLA DIDATTICA';
+  private static readonly TIPO_CONTRATTO_NON_DEFINITO = 'TIPOLOGIA DI CONTRATTO NON DEFINITA';
 
   static termina(data: any) {
     if (data.natura_rapporto === 'PRPR') {
@@ -73,21 +79,38 @@ export class InsegnamTools {
     return InsegnamTools.termina(data);
   }
 
+  static isAltaQualificazione(value?: string): boolean {
+    return !!value && AppConstants.corsiAltaQualificazione.includes(value);
+  }
+
+  static isDidatticaUfficiale(value?: string): boolean {
+    return !!value && AppConstants.corsiUfficiali.includes(value);
+  }
+
+  static isDidatticaIntegrativa(value?: string): boolean {
+    return !!value && AppConstants.corsiIntegrativi.includes(value);
+  }
+
+  static isSupportoDidattica(value?: string): boolean {
+    return !!value && AppConstants.corsiSupporto.includes(value);
+  }
+
+  static getTipoContrattoDescrizione(value?: string): string {
+    if (this.isAltaQualificazione(value)) {
+      return this.TIPO_CONTRATTO_ALTA_QUALIFICAZIONE;
+    } else if (this.isDidatticaUfficiale(value)) {
+      return this.TIPO_CONTRATTO_DIDATTICA_UFFICIALE;
+    } else if (this.isDidatticaIntegrativa(value)) {
+      return this.TIPO_CONTRATTO_DIDATTICA_INTEGRATIVA;
+    } else if (this.isSupportoDidattica(value)) {
+      return this.TIPO_CONTRATTO_SUPPORTO_DIDATTICA;
+    }
+
+    return this.TIPO_CONTRATTO_NON_DEFINITO;
+  }
+
   tipoContratto(value) {
-      if (value === 'ALTQG' || value === 'ALTQC' || value === 'ALTQU') {
-          return 'CONTRATTO DI ALTA QUALIFICAZIONE';
-      } else if (value === 'CONTC' || value === 'CONTU') {
-          return 'CONTRATTO DI DIDATTICA UFFICIALE';
-      } else if (value === 'INTC'
-                || value === 'INTU'
-                || value === 'INTXU'
-                || value === 'INTXC') {
-          return 'CONTRATTO DI DIDATTICA INTEGRATIVA';
-      } else if (value === 'SUPPU' || value === 'SUPPC') {
-          return 'CONTRATTO DI SUPPORTO ALLA DIDATTICA';
-      } else {
-          return 'TIPOLOGIA DI CONTRATTO NON DEFINITA';
-      }
+      return InsegnamTools.getTipoContrattoDescrizione(value);
   }
 
   tipoConferimento(value) {
@@ -154,11 +177,11 @@ export class InsegnamTools {
   }
 
   controlloCNA(tipo, ore) {
-    if (tipo === 'CONTC' || tipo === 'CONTU') {
+    if (InsegnamTools.isDidatticaUfficiale(tipo)) {
         return true;
-    } else if ((tipo === 'INTC' || tipo === 'INTU' || tipo === 'INTXU'  || tipo === 'INTXC') && ore > 15) {
+    } else if (InsegnamTools.isDidatticaIntegrativa(tipo) && ore > 15) {
         return true;
-    } else if ((tipo === 'ALTQG' || tipo === 'ALTQC' || tipo === 'ALTQU') && ore > 15) {
+    } else if (InsegnamTools.isAltaQualificazione(tipo) && ore > 15) {
         return true;
     } else {
         return false;
@@ -166,11 +189,11 @@ export class InsegnamTools {
   }
 
   controlloPLAO(tipo, ore) {
-    if (tipo === 'SUPPU' || tipo === 'SUPPC') {
+    if (InsegnamTools.isSupportoDidattica(tipo)) {
         return true;
-    } else if ((tipo === 'INTC' || tipo === 'INTU' || tipo === 'INTXU'  || tipo === 'INTXC') && ore <= 15) {
+    } else if (InsegnamTools.isDidatticaIntegrativa(tipo) && ore <= 15) {
         return true;
-    } else if ((tipo === 'ALTQG' || tipo === 'ALTQC' || tipo === 'ALTQU') && ore <= 15) {
+    } else if (InsegnamTools.isAltaQualificazione(tipo) && ore <= 15) {
         return true;
     } else {
         return false;
