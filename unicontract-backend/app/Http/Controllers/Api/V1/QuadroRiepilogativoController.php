@@ -11,7 +11,7 @@ use App\Precontrattuale as Pre;
 use App\User;
 use Auth;
 use App\Service\EmailService;
-use Illuminate\Support\Str;
+use App\Service\EmailHelper;
 use App\Service\NotificaService;
 
 class QuadroRiepilogativoController extends Controller
@@ -172,9 +172,9 @@ class QuadroRiepilogativoController extends Controller
 
         $pre = Pre::with(['user'])->where('insegn_id',$request->insegn_id)->first();     
        
-        if ($pre && $pre->user->email && !Str::contains(strtolower($pre->user->email),'@uniurb.it')){
+        if ($pre && $pre->user->email && !EmailHelper::hasAllowedDomain($pre->user->email)){
             $email = $pre->user->anagraficaugov()->first()->e_mail;                 
-            if ($email && Str::contains(strtolower($email),'@uniurb.it')){
+            if ($email && EmailHelper::hasAllowedDomain($email)){
                 //aggiornare email utente 
                 $pre->user->email = $email;
                 $pre->user->save();                
