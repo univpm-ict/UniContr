@@ -36,6 +36,26 @@ return [
      */
     'ufficiPerValidazione' =>  explode(',',env('UFF_VALIDAZIONE', '005144,005343')),    
 
+    /**
+     * Tipologie di corsi per didattica ufficiale.
+     */
+    'corsiUfficiali' => array_map('trim', explode(',', env('TIPI_CONTRATTO_DIDATTICA_UFFICIALE', 'CONTC,CONTU,CONTR'))),
+
+    /**
+     * Tipologie di corsi per didattica integrativa.
+     */
+    'corsiIntegrativi' => array_map('trim', explode(',', env('TIPI_CONTRATTO_DIDATTICA_INTEGRATIVA', 'INTC,INTU,INTXU,INTXC'))),
+
+    /**
+     * Tipologie di corsi di supporto.
+     */
+    'corsiSupporto' => array_map('trim', explode(',', env('TIPI_CONTRATTO_SUPPORTO_DIDATTICA', 'SUPPU,SUPPC'))),
+
+    /**
+     * Tipologie di corsi di alta qualificazione.
+     */
+    'corsiAltaQualificazione' => array_map('trim', explode(',', env('TIPI_CONTRATTO_ALTA_QUALIFICAZIONE', 'ALTQG,ALTQC,ALTQU'))),
+
     //configurazione email
     
     /**

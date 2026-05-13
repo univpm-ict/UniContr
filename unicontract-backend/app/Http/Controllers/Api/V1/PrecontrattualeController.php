@@ -44,6 +44,25 @@ class PrecontrattualeController extends Controller
         $this->service = new PrecontrattualeService($repo);
     }
 
+    private function getTipiContrattoValidi(): array
+    {
+        return array_values(array_unique(array_merge(
+            config('unidem.corsiAltaQualificazione', []),
+            config('unidem.corsiUfficiali', []),
+            config('unidem.corsiIntegrativi', []),
+            config('unidem.corsiSupporto', [])
+        )));
+    }
+
+    private function getTipiContrattoBanIncValidi(): array
+    {
+        return array_values(array_unique(array_merge(
+            config('unidem.corsiUfficiali', []),
+            config('unidem.corsiIntegrativi', []),
+            config('unidem.corsiSupporto', [])
+        )));
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -143,14 +162,21 @@ class PrecontrattualeController extends Controller
             return compact('data', 'message', 'success');
         }     
         
-        if ($insegnamentoUgov->motivo_atto=='APPR_INC' && !in_array($insegnamentoUgov->tipo_contratto, ['ALTQG','ALTQC','ALTQU'])){
+        if ($insegnamentoUgov->tipo_contratto && !in_array($insegnamentoUgov->tipo_contratto, $this->getTipiContrattoValidi())){
+            $data = null;
+            $message = 'Insegnamento non aggiornabile: tipologia di copertura non riconosciuta';
+            $success = false;
+            return compact('data', 'message', 'success');
+        }
+
+        if ($insegnamentoUgov->motivo_atto=='APPR_INC' && !in_array($insegnamentoUgov->tipo_contratto, config('unidem.corsiAltaQualificazione', []))){
             $data = null;
             $message = 'Insegnamento non aggiornabile: tipologia copertura non coerente con il motivo atto';
             $success = false;            
             return compact('data', 'message', 'success');
         }
         
-        if ($insegnamentoUgov->motivo_atto=='BAN_INC' && !in_array($insegnamentoUgov->tipo_contratto, ['CONTC', 'CONTU', 'INTC', 'INTU', 'INTXU', 'INTXC', 'SUPPU', 'SUPPC'])){
+        if ($insegnamentoUgov->motivo_atto=='BAN_INC' && !in_array($insegnamentoUgov->tipo_contratto, $this->getTipiContrattoBanIncValidi())){
             $data = null;
             $message = 'Insegnamento non aggiornabile: tipologia copertura non coerente con il motivo atto';
             $success = false;            
@@ -443,7 +469,7 @@ class PrecontrattualeController extends Controller
             }
 
             //verificare che al docente sia associata una email istituzionale        
-            if ($request->insegnamento['tipo_contratto'] && !in_array($request->insegnamento['tipo_contratto'], ['ALTQG','ALTQC','ALTQU', 'CONTC', 'CONTU', 'INTC', 'INTU', 'INTXU', 'INTXC', 'SUPPU', 'SUPPC'  ])){
+            if ($request->insegnamento['tipo_contratto'] && !in_array($request->insegnamento['tipo_contratto'], $this->getTipiContrattoValidi())){
                 $data = null;
                 $message = 'Insegnamento non importabile: tipologia di copertura non riconosciuta';
                 $success = false;            
@@ -458,14 +484,14 @@ class PrecontrattualeController extends Controller
                 return compact('data', 'message', 'success');
             }
 
-            if ($request->insegnamento['motivo_atto']=='APPR_INC' && !in_array($request->insegnamento['tipo_contratto'], ['ALTQG','ALTQC','ALTQU'])){
+            if ($request->insegnamento['motivo_atto']=='APPR_INC' && !in_array($request->insegnamento['tipo_contratto'], config('unidem.corsiAltaQualificazione', []))){
                 $data = null;
                 $message = 'Insegnamento non importabile: tipologia copertura non coerente con il motivo atto';
                 $success = false;            
                 return compact('data', 'message', 'success');
             }
             
-            if ($request->insegnamento['motivo_atto']=='BAN_INC' && !in_array($request->insegnamento['tipo_contratto'], ['CONTC', 'CONTU', 'INTC', 'INTU', 'INTXU', 'INTXC', 'SUPPU', 'SUPPC'])){
+            if ($request->insegnamento['motivo_atto']=='BAN_INC' && !in_array($request->insegnamento['tipo_contratto'], $this->getTipiContrattoBanIncValidi())){
                 $data = null;
                 $message = 'Insegnamento non importabile: tipologia copertura non coerente con il motivo atto';
                 $success = false;            

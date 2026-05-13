@@ -11,6 +11,7 @@ import { annoAccademicoCorrente } from 'src/app/shared/dynamic-form/utils';
 import { encode, decode } from 'base64-arraybuffer';
 import { saveAs } from 'file-saver';
 import { PrecontrattualeDocenteService } from 'src/app/services/precontrattualedocente.service';
+import { AppConstants } from 'src/app/app-constants';
 
 @Component({
     selector: 'app-lista-precontr-query',
@@ -223,31 +224,31 @@ export class ListaPrecontrQueryComponent extends BaseResearchComponent {
 
   keyValueRulesTipoContratto: { [key: string]: any[]} = {
     'ALTAQUALIFICAZIONE': [
-      { field: "insegnamento.tipo_contratto", operator: "In", value: ['ALTQG','ALTQC','ALTQU'], type: "" },
+      { field: "insegnamento.tipo_contratto", operator: "In", value: AppConstants.corsiAltaQualificazione, type: "" },
     ],
     'DIDATTICAUFFICIALE': [
-      { field: "insegnamento.tipo_contratto", operator: "In", value: ['CONTC', 'CONTU'], type: "" },    
+      { field: "insegnamento.tipo_contratto", operator: "In", value: AppConstants.corsiUfficiali, type: "" },    
     ],
     'DIDATTICAINTEGRATIVA': [
-      { field: "insegnamento.tipo_contratto", operator: "In", value: ['INTC','INTU','INTXU','INTXC'], type: "" },
+      { field: "insegnamento.tipo_contratto", operator: "In", value: AppConstants.corsiIntegrativi, type: "" },
     ],
     'SUPPORTO': [
-      { field: "insegnamento.tipo_contratto", operator: "In", value: ['SUPPU','SUPPC'], type: "" },    
+      { field: "insegnamento.tipo_contratto", operator: "In", value: AppConstants.corsiSupporto, type: "" },    
     ],
   };
 
   keyValueInverseRulesTipoContratto: { [key: string]: any[]} = {
     'ALTAQUALIFICAZIONE': [
-      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: ['ALTQG','ALTQC','ALTQU'], type: "" },
+      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: AppConstants.corsiAltaQualificazione, type: "" },
     ],
     'DIDATTICAUFFICIALE': [
-      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: ['CONTC', 'CONTU'], type: "" },    
+      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: AppConstants.corsiUfficiali, type: "" },    
     ],
     'DIDATTICAINTEGRATIVA': [
-      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: ['INTC','INTU','INTXU','INTXC'], type: "" },
+      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: AppConstants.corsiIntegrativi, type: "" },
     ],
     'SUPPORTO': [
-      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: ['SUPPU','SUPPC'], type: "" },    
+      { field: "insegnamento.tipo_contratto", operator: "NotIn", value: AppConstants.corsiSupporto, type: "" },    
     ],
   };
 
