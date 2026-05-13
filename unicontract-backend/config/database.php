@@ -56,7 +56,7 @@ return [
             'engine' => 'InnoDB ROW_FORMAT = DYNAMIC',
         ],
 
-        
+
         'off' => [
             'driver'    => env('DB_CONNECTION_SECOND'),
             'host'      => env('DB_HOST_SECOND'),
@@ -115,17 +115,17 @@ return [
 
         'oracle' => [
             'driver'         => 'oracle',
-            'tns'            => env('DB_TNS', ''),       
-            // 'host'           => env('DB_HOST', ''),
-            // 'port'           => env('DB_PORT', '1521'),            
-            'database'       => env('DB_DATABASE', 'xe'),
-            'service_name'   => env('DB_SERVICENAME', ''),
-            'username'       => env('DB_USERNAME_ORACLE', ''),
-            'password'       => env('DB_PASSWORD_ORACLE', ''),
-            // 'charset'        => env('DB_CHARSET', 'AL32UTF8'),
-            'prefix'         => env('DB_PREFIX', ''),
-            // 'prefix_schema'  => env('DB_SCHEMA_PREFIX', ''),
-            // 'server_version' => env('DB_SERVER_VERSION', '11g'),
+            //'tns'            => env('DB_UGOV_TNS', ''),
+            'host'           => env('DB_UGOV_HOST', ''),
+            'port'           => env('DB_UGOV_PORT', '1521'),
+            'database'       => env('DB_UGOV_DATABASE', ''),
+            'service_name'   => env('DB_UGOV_SERVICENAME', ''),
+            'username'       => env('DB_UGOV_USERNAME', ''),
+            'password'       => env('DB_UGOV_PASSWORD', ''),
+            //'charset'        => env('DB_UGOV_CHARSET', 'AL32UTF8'),
+            'prefix'         => env('DB_UGOV_PREFIX', ''),
+            //'prefix_schema'  => env('DB_UGOV_SCHEMA_PREFIX', ''),
+            //'server_version' => env('DB_UGOV_SERVER_VERSION', '11g'),
         ],
 
     ],
