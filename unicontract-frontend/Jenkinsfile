@@ -11,12 +11,12 @@ pipeline {
         STAGING_SERVER_DEPLOY_DIR = "/var/www/unicontr/unicontrclient"
         STAGING_SERVER_NAME = "10.134.7.151"
         STAGING_SERVER_SSH_PORT = "22"
-        STAGING_BUILD_DIR = "dist/UniContract-FrontEnd/browser"
+        STAGING_BUILD_DIR = "dist/UniContract-FrontEnd/browser/it"
 
         PROD_SERVER_DEPLOY_DIR = "/var/www/unicontr/unicontrclient"
         PROD_SERVER_NAME = "10.134.7.151"
         PROD_SERVER_SSH_PORT = "22"
-        PROD_BUILD_DIR = "dist/UniContract-FrontEnd/browser"
+        PROD_BUILD_DIR = "dist/UniContract-FrontEnd/browser/it"
 
         CURRENT_USER_USERNAME = sh(returnStdout: true, script: 'whoami')
         CURRENT_USER_UID = sh(returnStdout: true, script: 'id -u')
