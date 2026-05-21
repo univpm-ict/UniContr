@@ -1,0 +1,25 @@
+FROM alpine:latest
+ 
+ARG USER_USERNAME=user1
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
+ARG REMOTE_SSH_SERVER_NAME
+ARG REMOTE_SSH_SERVER_PORT
+ 
+# Create user and group
+RUN addgroup -g "$USER_GID" "$USER_USERNAME"
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --no-create-home \
+    --uid "$USER_UID" \
+    --ingroup "$USER_USERNAME" \
+    "$USER_USERNAME"
+ 
+# Install SSH client and utilities
+RUN apk add --no-cache util-linux openssh-client-default ca-certificates
+ 
+# Setup SSH known hosts
+RUN mkdir -p /etc/ssh
+RUN touch /etc/ssh/ssh_known_hosts
+RUN ssh-keyscan -p "$REMOTE_SSH_SERVER_PORT" "$REMOTE_SSH_SERVER_NAME" >> /etc/ssh/ssh_known_hosts
