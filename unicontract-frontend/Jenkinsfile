@@ -47,7 +47,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'npm run build -- --configuration=preprod --no-progress'
+                sh 'npm run build -- --configuration=preprod --base-href=/unicontr/ --no-progress'
             }
         }
         stage('Build Production Angular App') {
