@@ -32,6 +32,35 @@ class PdfSignService
 	 */
 	public static $byterange_string = '/ByteRange[0 ********** ********** **********]';
 
+    private static function getPdfBufferAsString($pdf): string
+    {
+        $buffer = $pdf->getMpdf()->buffer;
+
+        if (is_string($buffer)) {
+            return $buffer;
+        }
+
+        if (is_object($buffer) && method_exists($buffer, 'writeToString')) {
+            return $buffer->writeToString();
+        }
+
+        return (string) $buffer;
+    }
+
+    private static function setPdfBufferFromString($pdf, string $content): void
+    {
+        $buffer = $pdf->getMpdf()->buffer;
+
+        if (is_object($buffer) && method_exists($buffer, 'append')) {
+            $newBuffer = new \Mpdf\Buffer();
+            $newBuffer->append($content);
+            $pdf->getMpdf()->buffer = $newBuffer;
+            return;
+        }
+
+        $pdf->getMpdf()->buffer = $content;
+    }
+
     /**
 	 * Returns a temporary filename for caching object on filesystem.
 	 * @param string $type Type of file (name of the subdir on the tcpdf cache folder).
@@ -211,7 +240,7 @@ class PdfSignService
         $pdfdoc = $pdf;
         if (method_exists($pdf,'getMpdf')){
             $pdf->Output();
-            $pdfdoc = $pdf->getMpdf()->buffer;
+            $pdfdoc = self::getPdfBufferAsString($pdf);
         }
         
         //cerco la pagina dove posizionare la firma
@@ -313,7 +342,7 @@ class PdfSignService
         $buffer = $pdf->Output();
         // *** apply digital signature to the document ***
         // get the document content
-        $pdfdoc = $pdf->getMpdf()->buffer;
+        $pdfdoc = self::getPdfBufferAsString($pdf);
 
             
 
@@ -509,7 +538,10 @@ class PdfSignService
         $signature = current(unpack('H*', $signature));
         $signature = str_pad($signature, Self::$signature_max_length, '0');
         // Add signature to the document
-        $pdf->getMpdf()->buffer =  substr($pdfdoc, 0, $byte_range[1]).'<'.$signature.'>'.substr($pdfdoc, $byte_range[1]);
+        self::setPdfBufferFromString(
+            $pdf,
+            substr($pdfdoc, 0, $byte_range[1]).'<'.$signature.'>'.substr($pdfdoc, $byte_range[1])
+        );
         //$pdf->getMpdf()->bufferlen = strlen( $pdf->getMdpf()->buffer);		
         
     }
