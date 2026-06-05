@@ -44,8 +44,7 @@ if [ -d '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR' ]; then
     cp -a '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR/.' '$SERVER_TEMP_DIR/saml-certs/'
 fi
 
-rm -rf '$SERVER_DEPLOY_DIR'
-mkdir -p '$SERVER_DEPLOY_DIR'
+rm -rf $SERVER_DEPLOY_DIR/*
 
 tar -xzf '$SERVER_TEMP_DIR.tar.gz' -C '$SERVER_TEMP_DIR'
 cp -dR '$SERVER_TEMP_DIR/$BUILD_DIR/.' '$SERVER_DEPLOY_DIR/'
