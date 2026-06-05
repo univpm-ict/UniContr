@@ -1,0 +1,83 @@
+pipeline {
+    parameters {
+        booleanParam(name: 'DEPLOY_STAGING', defaultValue: false, description: 'set to true if you want to deploy into staging')
+        booleanParam(name: 'DEPLOY_PROD', defaultValue: false, description: 'set to true if you want to deploy into production')
+    }
+    environment {
+        BUILD_DIR = 'build'
+        CURRENT_USER_USERNAME = sh(returnStdout: true, script: 'whoami')
+        CURRENT_USER_UID = sh(returnStdout: true, script: 'id -u')
+        CURRENT_USER_GID = sh(returnStdout: true, script: 'id -g')
+
+        STAGING_SERVER_NAME = '10.134.7.151'
+        STAGING_SERVER_SSH_PORT = '22'
+        STAGING_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr2'
+
+        PROD_SERVER_NAME = '10.134.7.151'
+        PROD_SERVER_SSH_PORT = '22'
+        PROD_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr2'
+    }
+    agent any
+    stages {
+        stage('Build') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.build'
+                    reuseNode true
+                }
+            }
+            when {
+                expression { return params.DEPLOY_STAGING || params.DEPLOY_PROD }
+            }
+            steps {
+                sh('sh build.sh $BUILD_DIR')
+            }
+        }
+        stage('Deploy - Staging') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.deploy'
+                    additionalBuildArgs '--build-arg REMOTE_SSH_SERVER=${STAGING_SERVER_NAME} --build-arg USER_USERNAME=${CURRENT_USER_USERNAME} --build-arg USER_UID=${CURRENT_USER_UID} --build-arg USER_GID=${CURRENT_USER_GID}'
+                    reuseNode true
+                }
+            }
+            when {
+                expression { return params.DEPLOY_STAGING }
+            }
+            steps {
+                withCredentials(bindings: [sshUserPrivateKey(
+                                                credentialsId: 'deploy-unicontr',
+                                                usernameVariable: 'SERVER_USERNAME',
+                                                keyFileVariable: 'SERVER_SSH_KEYFILE')]) {
+                    sh('sh deploy.sh $BUILD_DIR $SERVER_SSH_KEYFILE $SERVER_USERNAME $STAGING_SERVER_NAME $STAGING_SERVER_DEPLOY_DIR $STAGING_SERVER_SSH_PORT')
+                }
+            }
+        }
+        stage('Deploy - Production') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.deploy'
+                    additionalBuildArgs '--build-arg REMOTE_SSH_SERVER=${PROD_SERVER_NAME} --build-arg USER_USERNAME=${CURRENT_USER_USERNAME} --build-arg USER_UID=${CURRENT_USER_UID} --build-arg USER_GID=${CURRENT_USER_GID}'
+                    reuseNode true
+                }
+            }
+            when {
+                branch 'master'
+                expression { return params.DEPLOY_PROD }
+            }
+            steps {
+                withCredentials(bindings: [sshUserPrivateKey(
+                                                credentialsId: 'deploy-unicontr',
+                                                usernameVariable: 'SERVER_USERNAME',
+                                                keyFileVariable: 'SERVER_SSH_KEYFILE')]) {
+                    sh('sh deploy.sh $BUILD_DIR $SERVER_SSH_KEYFILE $SERVER_USERNAME $PROD_SERVER_NAME $PROD_SERVER_DEPLOY_DIR $PROD_SERVER_SSH_PORT')
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

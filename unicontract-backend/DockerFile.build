@@ -1,0 +1,40 @@
+FROM php:8.4-fpm
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    zip unzip libaio1t64 libaio-dev wget git \
+    libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+    libonig-dev libxml2-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" zip pdo_mysql mbstring exif pcntl bcmath gd soap \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install oracle instant client
+RUN mkdir /opt/oracle
+RUN wget https://download.oracle.com/otn_software/linux/instantclient/2121000/instantclient-basic-linux.x64-21.21.0.0.0dbru.zip
+RUN wget https://download.oracle.com/otn_software/linux/instantclient/2121000/instantclient-sdk-linux.x64-21.21.0.0.0dbru.zip
+
+RUN unzip instantclient-basic-linux.x64-21.21.0.0.0dbru.zip -d /opt/oracle
+RUN unzip -o instantclient-sdk-linux.x64-21.21.0.0.0dbru.zip -d /opt/oracle
+
+RUN rm -rf *.zip
+RUN mv /opt/oracle/instantclient_21_21 /opt/oracle/instantclient
+
+# fix for libaio.so.1t64 to make instant client happy
+RUN ln -s /lib/x86_64-linux-gnu/libaio.so.1t64 /lib/x86_64-linux-gnu/libaio.so.1
+
+RUN echo /opt/oracle/instantclient/ > /etc/ld.so.conf.d/zz_php_oci8.conf
+RUN ldconfig
+
+# Install and configure php oci8 / pdo_oci extensions (required by yajra/laravel-oci8)
+RUN echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8-3.4.0
+RUN docker-php-ext-enable oci8
+RUN docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,/opt/oracle/instantclient,21.1 \
+    && docker-php-ext-install pdo_oci
+
+# Install Composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+COPY . .
