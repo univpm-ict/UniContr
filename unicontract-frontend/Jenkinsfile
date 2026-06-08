@@ -8,7 +8,7 @@ pipeline {
         BUILD_DIR = "dist/uana/browser"
 
 
-        STAGING_SERVER_DEPLOY_DIR = "/var/www/unicontr/unicontrclient"
+        STAGING_SERVER_DEPLOY_DIR = "/var/www/unicontr/unicontrclient-pp"
         STAGING_SERVER_NAME = "10.134.7.151"
         STAGING_SERVER_SSH_PORT = "22"
         STAGING_BUILD_DIR = "dist/UniContract-FrontEnd/browser/it"

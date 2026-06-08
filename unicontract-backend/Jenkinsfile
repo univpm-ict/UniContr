@@ -11,11 +11,11 @@ pipeline {
 
         STAGING_SERVER_NAME = '10.134.7.151'
         STAGING_SERVER_SSH_PORT = '22'
-        STAGING_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr2'
+        STAGING_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr-pp'
 
         PROD_SERVER_NAME = '10.134.7.151'
         PROD_SERVER_SSH_PORT = '22'
-        PROD_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr2'
+        PROD_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr'
     }
     agent any
     stages {
