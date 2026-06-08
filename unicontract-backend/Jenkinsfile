@@ -11,7 +11,7 @@ pipeline {
 
         STAGING_SERVER_NAME = '10.134.7.151'
         STAGING_SERVER_SSH_PORT = '22'
-        STAGING_SERVER_DEPLOY_DIR = '/var/www/unicontr/unicontr-pp'
+        STAGING_SERVER_DEPLOY_DIR = '/var/www/unicontr-pp/unicontr'
 
         PROD_SERVER_NAME = '10.134.7.151'
         PROD_SERVER_SSH_PORT = '22'
