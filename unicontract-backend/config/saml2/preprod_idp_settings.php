@@ -26,7 +26,7 @@ return $settings = array(
 
     // Service Provider Data that we are deploying
     'sp' => array(
-        
+
         // Specifies constraints on the name identifier to be used to
         // represent the requested subject.
         // Take a look on lib/Saml2/Constants.php to see the NameIdFormat supported
@@ -56,7 +56,7 @@ return $settings = array(
             // URL Location where the <Response> from the IdP will be returned,
             // using HTTP-Redirect binding.
             // Leave blank to use the 'saml_sls' route
-            'url' => '',        
+            'url' => '',
         ),
     ),
 
@@ -70,7 +70,7 @@ return $settings = array(
             // URL Target of the IdP where the SP will send the Authentication Request Message,
             // using HTTP-Redirect binding.
             'url' => $idp_host.'idp/profile/SAML2/Redirect/SSO',
-            
+
         ),
         // SLO endpoint info of the IdP.
         'singleLogoutService' => array(
@@ -169,16 +169,16 @@ return $settings = array(
         // this SP to be encrypted.
         'wantNameIdEncrypted' => false,
 
-        'wantAssertionsEncrypted' => true,
+        'wantAssertionsEncrypted' => false,
         // Authentication context.
         // Set to false and no AuthContext will be sent in the AuthNRequest,
         // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
         // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
-        'requestedAuthnContext' => false,        
+        'requestedAuthnContext' => false,
 
           //'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
         'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
-      
+
         //'digestAlgorithm' =>  'http://www.w3.org/2000/09/xmldsig#sha1',
         'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
     ),
