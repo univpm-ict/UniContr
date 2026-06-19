@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  API_URL: 'https://unidem-preprod.uniurb.it/unidem/unicontr/unicontr/public/',
-  baseHref: '/unicontr/',
-  whitelistedDomains: ['unidem-preprod.uniurb.it'],
-  blacklistedRoutes: ['https://unidem-preprod.uniurb.it/unidem/unicontr/unicontr/public/auth/'],
-  documentation: 'https://unidem-preprod.uniurb.it/unicontr/documentation/'
+  API_URL: 'https://unicontr.univpm.it/unicontr-pp/unicontr/public/',
+  baseHref: '/unicontr-pp/',
+  whitelistedDomains: ['unicontr.univpm.it'],
+  blacklistedRoutes: ['https://unicontr.univpm.it/unicontr-pp/unicontr/public/auth/'],
+  documentation: 'https://unicontr.univpm.it/unicontr-pp/documentation/'
 };

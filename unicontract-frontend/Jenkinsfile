@@ -1,0 +1,97 @@
+pipeline {
+    parameters {
+        booleanParam(name: 'DEPLOY_STAGING', defaultValue: false, description: 'set to true if you want to deploy into staging')
+        booleanParam(name: 'DEPLOY_PROD', defaultValue: false, description: 'set to true if you want to deploy into production')
+    }
+    agent any
+    environment {
+        BUILD_DIR = "dist/uana/browser"
+
+
+        STAGING_SERVER_DEPLOY_DIR = "/var/www/unicontr-pp/unicontrclient"
+        STAGING_SERVER_NAME = "10.134.7.151"
+        STAGING_SERVER_SSH_PORT = "22"
+        STAGING_BUILD_DIR = "dist/UniContract-FrontEnd/browser/it"
+
+        PROD_SERVER_DEPLOY_DIR = "/var/www/unicontr/unicontrclient"
+        PROD_SERVER_NAME = "10.134.7.151"
+        PROD_SERVER_SSH_PORT = "22"
+        PROD_BUILD_DIR = "dist/UniContract-FrontEnd/browser/it"
+
+        CURRENT_USER_USERNAME = sh(returnStdout: true, script: 'whoami')
+        CURRENT_USER_UID = sh(returnStdout: true, script: 'id -u')
+        CURRENT_USER_GID = sh(returnStdout: true, script: 'id -g')
+    }
+    stages {
+        stage('Install Dependencies') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.build'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh 'npm ci'
+            }
+        }
+        stage('Build Staging Angular App') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.build'
+                    reuseNode true
+                }
+            }
+            when {
+                expression {
+                    return params.DEPLOY_STAGING
+                }
+            }
+            steps {
+                sh 'npm run build -- --configuration=preprod --base-href=/unicontr-pp/ --no-progress'
+            }
+        }
+        stage('Build Production Angular App') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.build'
+                    reuseNode true
+                }
+            }
+            when {
+                expression {
+                    return params.DEPLOY_PROD
+                }
+            }
+            steps {
+                sh 'npm run build -- --configuration=production --base-href=/unicontr/ --no-progress'
+            }
+        }
+        stage('Deploy Staging') {
+            agent {
+                dockerfile {
+                    filename 'DockerFile.deploy'
+                    additionalBuildArgs  '--build-arg REMOTE_SSH_SERVER_NAME=${STAGING_SERVER_NAME} --build-arg REMOTE_SSH_SERVER_PORT=${STAGING_SERVER_SSH_PORT} --build-arg USER_USERNAME=${CURRENT_USER_USERNAME} --build-arg USER_UID=${CURRENT_USER_UID} --build-arg USER_GID=${CURRENT_USER_GID}'
+                    reuseNode true
+                }
+            }
+            when {
+                expression {
+                    return params.DEPLOY_STAGING
+                }
+            }
+            steps {
+                withCredentials(bindings: [sshUserPrivateKey(credentialsId: 'deploy-unicontr', \
+                                                             usernameVariable: 'SERVER_USERNAME', \
+                                                             keyFileVariable: 'SERVER_SSH_KEYFILE')]) {
+                    sh('sh deploy.sh $STAGING_BUILD_DIR $SERVER_SSH_KEYFILE $SERVER_USERNAME $STAGING_SERVER_NAME $STAGING_SERVER_DEPLOY_DIR $STAGING_SERVER_SSH_PORT')
+
+                }
+            }
+        }
+    }
+    post {
+        always {
+           cleanWs()
+        }
+    }
+}

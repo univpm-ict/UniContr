@@ -1,0 +1,20 @@
+FROM alpine:latest
+
+ARG USER_USERNAME=user1
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
+ARG REMOTE_SSH_SERVER
+
+RUN addgroup -g "$USER_GID" "$USER_USERNAME"
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --no-create-home \
+    --uid "$USER_UID" \
+    --ingroup "$USER_USERNAME" \
+    "$USER_USERNAME"
+
+RUN apk add --no-cache util-linux openssh-client ca-certificates tar gzip
+
+RUN mkdir -p /etc/ssh
+RUN ssh-keyscan "$REMOTE_SSH_SERVER" >> /etc/ssh/ssh_known_hosts
