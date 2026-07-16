@@ -36,10 +36,6 @@ if [ -d '$SERVER_DEPLOY_DIR/storage/logs' ]; then
     cp -a '$SERVER_DEPLOY_DIR/storage/logs' '$SERVER_TEMP_DIR/storage-logs'
 fi
 
-if [ -d '$SERVER_DEPLOY_DIR/storage/backups' ]; then
-    cp -a '$SERVER_DEPLOY_DIR/storage/backups' '$SERVER_TEMP_DIR/storage-backups'
-fi
-
 if [ -d '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR' ]; then
     mkdir -p '$SERVER_TEMP_DIR/saml-certs'
     cp -a '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR/.' '$SERVER_TEMP_DIR/saml-certs/'
@@ -76,22 +72,11 @@ if [ -d '$SERVER_TEMP_DIR/storage-logs' ]; then
     echo '  * storage/logs OK'
 fi
 
-if [ -d '$SERVER_TEMP_DIR/storage-backups' ]; then
-    mkdir -p '$SERVER_DEPLOY_DIR/storage'
-    cp -a '$SERVER_TEMP_DIR/storage-backups/.' '$SERVER_DEPLOY_DIR/storage/backups/'
-    echo '  * storage/backups OK'
-fi
-
 if [ -d '$SERVER_TEMP_DIR/saml-certs' ]; then
     mkdir -p '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR'
     cp -a '$SERVER_TEMP_DIR/saml-certs/.' '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR/'
     echo '  * saml-certs OK'
 fi
-
-echo '  * initializing app and directories'
-cd '$SERVER_DEPLOY_DIR'
-mkdir -p bootstrap/cache storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs storage/backups
-chmod -R ug+rwx storage bootstrap/cache
 
 if [ ! -f .env ]; then
     echo 'ERROR: .env not found on server — copy it manually before deploying'
@@ -99,9 +84,7 @@ if [ ! -f .env ]; then
 fi
 
 php artisan storage:link --force
-php artisan migrate --force
 php artisan optimize:clear
-php artisan optimize
 
 echo '  * cleaning'
 rm -rf '$SERVER_TEMP_DIR' '$SERVER_TEMP_DIR.tar.gz'
