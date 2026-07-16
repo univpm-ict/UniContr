@@ -20,61 +20,59 @@ scp -P "$SERVER_SSH_PORT" -i "$SERVER_SSH_KEYFILE" "$ARCHIVE_FILE" "$SERVER_USER
 
 ssh -i "$SERVER_SSH_KEYFILE" -p "$SERVER_SSH_PORT" "$SERVER_USERNAME@$SERVER_NAME" "
 set -e
+umask 0002
 
-echo '  * saving useful files into temp dir /tmp/unicontr-deploy-$(uuidgen)'
-mkdir -p '$SERVER_TEMP_DIR'
+mkdir -p '$SERVER_TEMP_DIR' '$SERVER_DEPLOY_DIR'
+cd '$SERVER_DEPLOY_DIR'
 
-if [ -f '$SERVER_DEPLOY_DIR/.env' ]; then
-    cp '$SERVER_DEPLOY_DIR/.env' '$SERVER_TEMP_DIR/.env'
+echo '  * saving useful files into temp dir'
+if [ -f .env ]; then
+    cp .env '$SERVER_TEMP_DIR/.env'
 fi
 
-if [ -d '$SERVER_DEPLOY_DIR/storage/app' ]; then
-    cp -a '$SERVER_DEPLOY_DIR/storage/app' '$SERVER_TEMP_DIR/storage-app'
+if [ -d storage/app ]; then
+    cp -a storage/app '$SERVER_TEMP_DIR/storage-app'
 fi
 
-if [ -d '$SERVER_DEPLOY_DIR/storage/logs' ]; then
-    cp -a '$SERVER_DEPLOY_DIR/storage/logs' '$SERVER_TEMP_DIR/storage-logs'
+if [ -d storage/logs ]; then
+    cp -a storage/logs '$SERVER_TEMP_DIR/storage-logs'
 fi
 
-if [ -d '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR' ]; then
+if [ -d '$SAML_CERTS_DIR' ]; then
     mkdir -p '$SERVER_TEMP_DIR/saml-certs'
-    cp -a '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR/.' '$SERVER_TEMP_DIR/saml-certs/'
-fi
-
-if [ -f '$SERVER_DEPLOY_DIR/artisan' ]; then
-    echo '  * clearing app cache'
-    php $SERVER_DEPLOY_DIR/artisan cache:clear
+    cp -a '$SAML_CERTS_DIR/.' '$SERVER_TEMP_DIR/saml-certs/'
 fi
 
 echo '  * removing old files from deploy dir'
-rm -rf $SERVER_DEPLOY_DIR/*
+find . -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 
 echo '  * extracting build results into temp dir'
 tar -xzf '$SERVER_TEMP_DIR.tar.gz' -C '$SERVER_TEMP_DIR'
-echo '  * copying build results into deploy dir'
-cp -dR '$SERVER_TEMP_DIR/$BUILD_DIR/.' '$SERVER_DEPLOY_DIR/'
 
-echo '  * restoring useful files from temp dir into deploy dir'
+echo '  * copying build results into deploy dir'
+cp -dR '$SERVER_TEMP_DIR/$BUILD_DIR/.' .
+
+echo '  * restoring useful files from temp dir'
 if [ -f '$SERVER_TEMP_DIR/.env' ]; then
-    cp '$SERVER_TEMP_DIR/.env' '$SERVER_DEPLOY_DIR/.env'
+    cp '$SERVER_TEMP_DIR/.env' .env
     echo '  * .env OK'
 fi
 
 if [ -d '$SERVER_TEMP_DIR/storage-app' ]; then
-    mkdir -p '$SERVER_DEPLOY_DIR/storage'
-    cp -a '$SERVER_TEMP_DIR/storage-app/.' '$SERVER_DEPLOY_DIR/storage/app/'
+    mkdir -p storage/app
+    cp -a '$SERVER_TEMP_DIR/storage-app/.' storage/app/
     echo '  * storage/app OK'
 fi
 
 if [ -d '$SERVER_TEMP_DIR/storage-logs' ]; then
-    mkdir -p '$SERVER_DEPLOY_DIR/storage'
-    cp -a '$SERVER_TEMP_DIR/storage-logs/.' '$SERVER_DEPLOY_DIR/storage/logs/'
+    mkdir -p storage/logs
+    cp -a '$SERVER_TEMP_DIR/storage-logs/.' storage/logs/
     echo '  * storage/logs OK'
 fi
 
 if [ -d '$SERVER_TEMP_DIR/saml-certs' ]; then
-    mkdir -p '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR'
-    cp -a '$SERVER_TEMP_DIR/saml-certs/.' '$SERVER_DEPLOY_DIR/$SAML_CERTS_DIR/'
+    mkdir -p '$SAML_CERTS_DIR'
+    cp -a '$SERVER_TEMP_DIR/saml-certs/.' '$SAML_CERTS_DIR/'
     echo '  * saml-certs OK'
 fi
 
@@ -83,6 +81,12 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+echo '  * initializing app directories'
+mkdir -p bootstrap/cache storage/app/public storage/framework/cache/data \
+         storage/framework/sessions storage/framework/views storage/logs storage/backups
+chmod -R ug+rwx storage bootstrap/cache
+
+echo '  * initializing app'
 php artisan storage:link --force
 php artisan optimize:clear
 
